@@ -1,3 +1,5 @@
+import { PageRenderer } from './renderer/PageRenderer.js';
+
 (function() {
   const url = window.location.href;
   const isMarkdown = /\.(md|markdown)(\?.*)?$/i.test(url) ||
@@ -12,14 +14,8 @@
       return;
     }
 
-    import(chrome.runtime.getURL('lib/content/renderer/PageRenderer.js'))
-      .then(({ PageRenderer }) => {
-        const renderer = new PageRenderer(text, url);
-        renderer.render();
-      })
-      .catch((err) => {
-        console.error('Markdown 渲染器加载失败:', err);
-      });
+    const renderer = new PageRenderer(text, url);
+    renderer.render();
   }
 
   if (document.readyState === 'loading') {

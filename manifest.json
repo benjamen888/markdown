@@ -18,14 +18,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content/content-script.js"],
+      "js": ["lib/content-bundle.js"],
       "run_at": "document_start"
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["lib/*", "lib/**/*"],
-      "matches": ["<all_urls>"]
     }
   ],
   "icons": {}
