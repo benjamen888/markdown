@@ -6,6 +6,9 @@ import anchor from 'markdown-it-anchor';
 import toc from 'markdown-it-toc-done-right';
 import hljs from 'highlight.js';
 import katex from 'katex';
+import mermaid from 'mermaid';
+
+mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
 // 数学公式插件
 function mathPlugin(md) {
@@ -97,5 +100,31 @@ export function createMarkdownIt() {
   md.use(mathPlugin);
   highlightPlugin(md);
 
+  const defaultFence = md.renderer.rules.fence.bind(md.renderer.rules);
+  md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    if (token.info.trim() === 'mermaid') {
+      const id = `mermaid-${idx}-${Date.now()}`;
+      return `<div class="mermaid-placeholder" data-mermaid-id="${id}" data-source="${encodeURIComponent(token.content)}"></div>`;
+    }
+    return defaultFence(tokens, idx, options, env, self);
+  };
+
   return md;
+}
+
+export async function renderMermaidDiagrams(container) {
+  const placeholders = container.querySelectorAll('.mermaid-placeholder');
+  for (const el of placeholders) {
+    const source = decodeURIComponent(el.dataset.source);
+    const id = el.dataset.mermaidId;
+    try {
+      const { svg } = await mermaid.render(id, source);
+      el.innerHTML = svg;
+      el.classList.remove('mermaid-placeholder');
+      el.classList.add('mermaid-rendered');
+    } catch (err) {
+      el.innerHTML = `<pre style="color:red;">Mermaid 渲染错误: ${err.message}</pre>`;
+    }
+  }
 }

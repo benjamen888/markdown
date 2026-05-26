@@ -1,4 +1,4 @@
-import { createMarkdownIt } from './plugins.js';
+import { createMarkdownIt, renderMermaidDiagrams } from './plugins.js';
 
 export class Preview {
   constructor(container) {
@@ -8,5 +8,6 @@ export class Preview {
 
   render(markdown) {
     this.container.innerHTML = this.md.render(markdown || '');
+    renderMermaidDiagrams(this.container);
   }
 }
