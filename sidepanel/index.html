@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown 浏览器</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部工具栏 -->
+    <div id="toolbar">
+      <div class="mode-tabs">
+        <button class="tab active" data-mode="split">分屏</button>
+        <button class="tab" data-mode="edit">编辑</button>
+        <button class="tab" data-mode="preview">预览</button>
+        <button class="tab" data-mode="files">文件</button>
+      </div>
+      <div class="toolbar-actions">
+        <button id="btn-open" title="打开文件">📁</button>
+        <button id="btn-open-folder" title="打开文件夹">📂</button>
+        <button id="btn-open-url" title="从 URL 打开">🔗</button>
+        <button id="btn-new" title="新建">📄</button>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div id="main">
+      <!-- 编辑器区 -->
+      <div id="editor-pane">
+        <div id="editor"></div>
+      </div>
+      <!-- 预览区 -->
+      <div id="preview-pane">
+        <div id="preview"></div>
+      </div>
+      <!-- 文件浏览器区 -->
+      <div id="files-pane" style="display:none;">
+        <div id="recent-files"></div>
+        <div id="file-tree"></div>
+      </div>
+    </div>
+
+    <!-- 底部状态栏 -->
+    <div id="statusbar">
+      <span id="status-filename">未打开文件</span>
+      <span id="status-info">UTF-8 | 0 行 | 0 字</span>
+      <div class="status-actions">
+        <button id="btn-save" title="保存">💾</button>
+        <button id="btn-download" title="下载">⬇</button>
+        <button id="btn-theme" title="切换主题">🌙</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- URL 输入对话框 -->
+  <dialog id="url-dialog">
+    <form method="dialog">
+      <label>输入 Markdown 文件 URL:</label>
+      <input type="url" id="url-input" placeholder="https://example.com/readme.md">
+      <div class="dialog-actions">
+        <button type="button" id="url-cancel">取消</button>
+        <button type="submit" id="url-confirm">打开</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="../lib/sidepanel-bundle.js"></script>
+</body>
+</html>
