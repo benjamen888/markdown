@@ -22,5 +22,11 @@
       "run_at": "document_start"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*", "lib/**/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "icons": {}
 }
