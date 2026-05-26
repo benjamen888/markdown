@@ -5,6 +5,7 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirro
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { autocompletion, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching } from '@codemirror/language';
+import { wysiwygExtension } from './wysiwyg.js';
 
 export class Editor {
   constructor(container, onChange) {
@@ -12,37 +13,54 @@ export class Editor {
     this.view = new EditorView({
       state: EditorState.create({
         doc: '',
-        extensions: [
-          lineNumbers(),
-          highlightActiveLine(),
-          highlightActiveLineGutter(),
-          history(),
-          bracketMatching(),
-          closeBrackets(),
-          highlightSelectionMatches(),
-          syntaxHighlighting(defaultHighlightStyle),
-          markdown({ base: markdownLanguage }),
-          autocompletion(),
-          keymap.of([
-            ...defaultKeymap,
-            ...historyKeymap,
-            ...searchKeymap,
-            ...closeBracketsKeymap,
-            indentWithTab,
-          ]),
-          EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
-              this.onChange(update.state.doc.toString());
-            }
-          }),
-          EditorView.theme({
-            '&': { height: '100%' },
-            '.cm-scroller': { overflow: 'auto' },
-          }),
-        ],
+        extensions: this.getBaseExtensions(),
       }),
       parent: container,
     });
+  }
+
+  getBaseExtensions() {
+    return [
+      lineNumbers(),
+      highlightActiveLine(),
+      highlightActiveLineGutter(),
+      history(),
+      bracketMatching(),
+      closeBrackets(),
+      highlightSelectionMatches(),
+      syntaxHighlighting(defaultHighlightStyle),
+      markdown({ base: markdownLanguage }),
+      autocompletion(),
+      keymap.of([
+        ...defaultKeymap,
+        ...historyKeymap,
+        ...searchKeymap,
+        ...closeBracketsKeymap,
+        indentWithTab,
+      ]),
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          this.onChange(update.state.doc.toString());
+        }
+      }),
+      EditorView.theme({
+        '&': { height: '100%' },
+        '.cm-scroller': { overflow: 'auto' },
+      }),
+    ];
+  }
+
+  setWysiwyg(enabled) {
+    const content = this.getContent();
+    const extensions = this.getBaseExtensions();
+    if (enabled) {
+      extensions.push(wysiwygExtension);
+    }
+    this.view.setState(EditorState.create({
+      doc: content,
+      extensions,
+      selection: this.view.state.selection,
+    }));
   }
 
   getContent() {
