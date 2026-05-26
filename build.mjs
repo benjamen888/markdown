@@ -1,10 +1,11 @@
 import { build } from 'esbuild';
 
 await build({
-  entryPoints: ['sidepanel/app.js'],
+  entryPoints: ['sidepanel/app.js', 'content/content-script.js'],
   bundle: true,
   format: 'esm',
-  outfile: 'lib/sidepanel-bundle.js',
+  outdir: 'lib',
+  splitting: true,
   sourcemap: true,
 });
 console.log('Build complete');
