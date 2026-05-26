@@ -71,6 +71,7 @@ export function injectStyles() {
     .md-ext-container th { background: #f5f5f5; }
     .md-ext-container img { max-width: 100%; }
     .md-ext-container hr { border: none; border-top: 1px solid #e0e0e0; margin: 1em 0; }
+    .md-ext-container .header-anchor { display: none; }
     .md-ext-container .task-list-item { list-style: none; }
     .md-ext-container .task-list-item input { margin-right: 6px; }
     .md-ext-container .copy-btn { float: right; background: #eee; border: 1px solid #ddd; border-radius: 3px; padding: 2px 8px; font-size: 11px; cursor: pointer; }

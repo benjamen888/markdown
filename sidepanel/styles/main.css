@@ -258,6 +258,7 @@ dialog input {
 #preview th { background: var(--bg-secondary); }
 #preview img { max-width: 100%; }
 #preview hr { border: none; border-top: 1px solid var(--border); margin: 1em 0; }
+#preview .header-anchor { display: none; }
 #preview .task-list-item { list-style: none; }
 #preview .task-list-item input { margin-right: 6px; }
 #preview .footnotes { margin-top: 2em; border-top: 1px solid var(--border); padding-top: 1em; font-size: 0.9em; }

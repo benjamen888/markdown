@@ -8,7 +8,7 @@ import { PageRenderer } from './renderer/PageRenderer.js';
   if (!isMarkdown) return;
 
   function init() {
-    const text = document.body.innerText;
+    const text = document.body.textContent;
     if (!text || text.trim().length === 0) {
       setTimeout(init, 100);
       return;
