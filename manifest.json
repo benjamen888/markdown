@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Markdown 浏览器",
+  "version": "1.0.0",
+  "description": "浏览和编辑 Markdown 文件",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content-script.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {}
+}
