@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Markdown 浏览器",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "浏览和编辑 Markdown 文件",
   "permissions": [
     "sidePanel",
