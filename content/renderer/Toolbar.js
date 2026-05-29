@@ -1,7 +1,8 @@
 export class Toolbar {
-  constructor(onModeChange, onOpenSidePanel) {
+  constructor(onModeChange, onOpenSidePanel, onExport) {
     this.onModeChange = onModeChange;
     this.onOpenSidePanel = onOpenSidePanel;
+    this.onExport = onExport;
     this.currentMode = 'preview';
     this.element = this.create();
   }
@@ -27,6 +28,17 @@ export class Toolbar {
       this.buttons[mode] = btn;
     }
 
+    // 导出按钮
+    this.exportPngBtn = document.createElement('button');
+    this.exportPngBtn.textContent = '📷 PNG';
+    this.exportPngBtn.title = '导出为 PNG';
+    this.exportPngBtn.addEventListener('click', () => this.onExport('png'));
+
+    this.exportPdfBtn = document.createElement('button');
+    this.exportPdfBtn.textContent = '📄 PDF';
+    this.exportPdfBtn.title = '导出为 PDF';
+    this.exportPdfBtn.addEventListener('click', () => this.onExport('pdf'));
+
     const spacer = document.createElement('div');
     spacer.className = 'md-ext-spacer';
 
@@ -38,6 +50,8 @@ export class Toolbar {
     for (const mode of modes) {
       bar.appendChild(this.buttons[mode]);
     }
+    bar.appendChild(this.exportPngBtn);
+    bar.appendChild(this.exportPdfBtn);
     bar.appendChild(spacer);
     bar.appendChild(openBtn);
 

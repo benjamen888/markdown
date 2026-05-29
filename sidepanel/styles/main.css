@@ -117,13 +117,45 @@ body {
 #preview-pane {
   flex: 1;
   overflow: auto;
-  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+#preview-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+#preview-toolbar button {
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#preview-toolbar button:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent);
 }
 
 #preview {
+  flex: 1;
+  padding: 16px 20px;
   line-height: 1.6;
   font-size: 14px;
+  overflow: auto;
 }
+
 
 /* 文件面板 */
 #files-pane {

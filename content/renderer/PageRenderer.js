@@ -17,7 +17,8 @@ export class PageRenderer {
     this.editMode = new EditMode();
     this.toolbar = new Toolbar(
       (mode) => this.switchMode(mode),
-      () => this.openSidePanel()
+      () => this.openSidePanel(),
+      (type) => this.handleExport(type)
     );
 
     this.modes = {
@@ -69,5 +70,75 @@ export class PageRenderer {
 
   openSidePanel() {
     chrome.runtime.sendMessage({ action: 'openInSidePanel', url: this.url });
+  }
+
+  async handleExport(type) {
+    const container = this.previewMode.element;
+    if (!container.innerHTML.trim()) {
+      alert('预览内容为空，无法导出');
+      return;
+    }
+
+    const btn = type === 'png' ? this.toolbar.exportPngBtn : this.toolbar.exportPdfBtn;
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '导出中...';
+
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const canvas = await html2canvas(container, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+      });
+
+      if (type === 'png') {
+        const link = document.createElement('a');
+        const fileName = this.url?.split('/').pop()?.replace(/\.md$/, '') || 'markdown';
+        link.download = `${fileName}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } else {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+
+        const pdfWidth = 210;
+        const pdfHeight = 297;
+        const margin = 10;
+        const contentWidth = pdfWidth - margin * 2;
+        const contentHeight = (imgHeight * contentWidth) / imgWidth;
+
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+        });
+
+        let heightLeft = contentHeight;
+        let position = margin;
+
+        pdf.addImage(imgData, 'PNG', margin, position, contentWidth, contentHeight);
+        heightLeft -= (pdfHeight - margin * 2);
+
+        while (heightLeft > 0) {
+          position = -(pdfHeight - margin * 2) + margin;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', margin, position, contentWidth, contentHeight);
+          heightLeft -= (pdfHeight - margin * 2);
+        }
+
+        const fileName = this.url?.split('/').pop()?.replace(/\.md$/, '') || 'markdown';
+        pdf.save(`${fileName}.pdf`);
+      }
+    } catch (err) {
+      console.error('导出失败:', err);
+      alert('导出失败: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
   }
 }

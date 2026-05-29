@@ -5,6 +5,8 @@ import { FileTree } from './file-manager/FileTree.js';
 import { RecentFiles } from './file-manager/RecentFiles.js';
 import { setupShortcuts } from './editor/shortcuts.js';
 import { setupScrollSync } from './preview/scroll-sync.js';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 class App {
   constructor() {
@@ -59,6 +61,10 @@ class App {
     document.getElementById('btn-download').addEventListener('click', () => this.downloadFile());
     document.getElementById('btn-theme').addEventListener('click', () => this.toggleTheme());
 
+    // 导出按钮
+    document.getElementById('btn-export-png').addEventListener('click', () => this.exportToPng());
+    document.getElementById('btn-export-pdf').addEventListener('click', () => this.exportToPdf());
+
     // URL 对话框
     document.getElementById('url-cancel').addEventListener('click', () => {
       document.getElementById('url-dialog').close();
@@ -86,7 +92,7 @@ class App {
     switch (mode) {
       case 'split':
         editorPane.style.display = 'block';
-        previewPane.style.display = 'block';
+        previewPane.style.display = 'flex';
         editorPane.style.flex = '1';
         previewPane.style.flex = '1';
         break;
@@ -95,7 +101,7 @@ class App {
         editorPane.style.flex = '1';
         break;
       case 'preview':
-        previewPane.style.display = 'block';
+        previewPane.style.display = 'flex';
         previewPane.style.flex = '1';
         break;
       case 'files':
@@ -200,6 +206,99 @@ class App {
   setupSidePanel() {
     if (chrome.sidePanel) {
       chrome.sidePanel.setOptions({ path: 'sidepanel/index.html' });
+    }
+  }
+
+  async exportToPng() {
+    const preview = document.getElementById('preview');
+    if (!preview.innerHTML.trim()) {
+      alert('预览内容为空，无法导出');
+      return;
+    }
+
+    const btn = document.getElementById('btn-export-png');
+    btn.disabled = true;
+    btn.textContent = '导出中...';
+
+    try {
+      const canvas = await html2canvas(preview, {
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#ffffff',
+        scale: 2,
+        useCORS: true,
+      });
+
+      const link = document.createElement('a');
+      const fileName = (this.currentFile?.name || 'untitled').replace(/\.md$/, '');
+      link.download = `${fileName}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error('导出 PNG 失败:', err);
+      alert('导出 PNG 失败: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📷 PNG';
+    }
+  }
+
+  async exportToPdf() {
+    const preview = document.getElementById('preview');
+    if (!preview.innerHTML.trim()) {
+      alert('预览内容为空，无法导出');
+      return;
+    }
+
+    const btn = document.getElementById('btn-export-pdf');
+    btn.disabled = true;
+    btn.textContent = '导出中...';
+
+    try {
+      const canvas = await html2canvas(preview, {
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#ffffff',
+        scale: 2,
+        useCORS: true,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+
+      // A4 页面尺寸 (mm)
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+      const margin = 10;
+      const contentWidth = pdfWidth - margin * 2;
+      const contentHeight = (imgHeight * contentWidth) / imgWidth;
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      let heightLeft = contentHeight;
+      let position = margin;
+
+      // 第一页
+      pdf.addImage(imgData, 'PNG', margin, position, contentWidth, contentHeight);
+      heightLeft -= (pdfHeight - margin * 2);
+
+      // 如果内容超过一页，添加更多页
+      while (heightLeft > 0) {
+        position = -(pdfHeight - margin * 2) + margin;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', margin, position, contentWidth, contentHeight);
+        heightLeft -= (pdfHeight - margin * 2);
+      }
+
+      const fileName = (this.currentFile?.name || 'untitled').replace(/\.md$/, '');
+      pdf.save(`${fileName}.pdf`);
+    } catch (err) {
+      console.error('导出 PDF 失败:', err);
+      alert('导出 PDF 失败: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📄 PDF';
     }
   }
 }
